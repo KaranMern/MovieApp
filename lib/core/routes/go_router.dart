@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sample/features/Movies/presentation/Screens/dashboard.dart';
 import 'package:sample/features/Movies/presentation/Screens/detail_screen.dart';

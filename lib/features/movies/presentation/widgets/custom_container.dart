@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sample/core/Constants/api_constants.dart';
-
 import '../../../../core/responsive/responsive.dart';
 
 class CustomCard extends StatelessWidget {
@@ -22,7 +21,9 @@ class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = Responsive(context);
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return GestureDetector(
       onTap: onPressed,
@@ -55,7 +56,7 @@ class CustomCard extends StatelessWidget {
                             color: colors.primary,
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                                loadingProgress.expectedTotalBytes!
                                 : null,
                           ),
                         );
@@ -94,9 +95,9 @@ class CustomCard extends StatelessWidget {
                           SizedBox(width: r.w * 0.008),
                           Text(
                             voteAverage.toStringAsFixed(1),
-                            style: r.captionStyle(
-                              Colors.white,
-                              weight: FontWeight.bold,
+                            style: textTheme.labelSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -115,9 +116,9 @@ class CustomCard extends StatelessWidget {
               child: Text(
                 title,
                 textAlign: TextAlign.center,
-                style: r.bodyStyle(
-                  colors.onBackground,
-                  weight: FontWeight.w600,
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colors.onBackground,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -129,7 +130,9 @@ class CustomCard extends StatelessWidget {
             // Release Date
             Text(
               releaseDate,
-              style: r.captionStyle(colors.onBackground.withOpacity(0.7)),
+              style: textTheme.bodySmall?.copyWith(
+                color: colors.onBackground.withOpacity(0.7),
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

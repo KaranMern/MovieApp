@@ -3,40 +3,31 @@ import 'package:flutter/material.dart';
 class CustomTabBar extends StatelessWidget implements PreferredSizeWidget {
   final TabController controller;
   final List<String> tabs;
-  final Color labelColor;
-  final Color unselectedLabelColor;
-  final TextStyle Function(Color color, {FontWeight? weight})?
-  labelStyleBuilder;
   final EdgeInsetsGeometry? labelPadding;
-  final Color indicatorColor;
   final void Function(int index)? onTap;
 
   const CustomTabBar({
     Key? key,
     required this.controller,
     required this.tabs,
-    required this.labelColor,
-    required this.unselectedLabelColor,
-    this.labelStyleBuilder,
     this.labelPadding,
-    required this.indicatorColor,
     this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return TabBar(
       controller: controller,
       isScrollable: true,
       labelPadding: labelPadding,
-      labelColor: labelColor,
-      labelStyle: labelStyleBuilder?.call(labelColor),
-      unselectedLabelStyle: labelStyleBuilder?.call(
-        unselectedLabelColor,
-        weight: FontWeight.normal,
-      ),
-      unselectedLabelColor: unselectedLabelColor,
-      indicatorColor: indicatorColor,
+      labelColor: colors.onPrimary,
+      unselectedLabelColor: colors.onPrimary.withOpacity(0.6),
+      labelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+      unselectedLabelStyle: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.normal),
+      indicatorColor: colors.onPrimary,
       onTap: onTap,
       tabs: tabs.map((text) => Tab(text: text)).toList(),
     );

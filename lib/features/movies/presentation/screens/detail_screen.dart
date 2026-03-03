@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/Constants/api_constants.dart';
 import '../../../../core/responsive/responsive.dart';
 import '../../domain/entities/movie_detail_entity.dart';
-import '../Widgets/details_screen_header.dart';
-import '../Widgets/detail_screen_footer.dart';
+import '../widgets/custom_mobile_layout.dart';
+import '../widgets/custom_tablet_layout.dart';
 
 class Detailscreen extends StatelessWidget {
   final ResultEntity result;
@@ -13,14 +14,19 @@ class Detailscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = Responsive(context);
     final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        title: Text(result!.id!.toString()),
+        centerTitle: false,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: (){
+            context.pop();
+          },
           icon: Icon(
             Icons.arrow_back_ios,
             color: colors.onBackground,
@@ -29,59 +35,11 @@ class Detailscreen extends StatelessWidget {
         ),
       ),
       body: r.isMobile
-          ? _MobileLayout(result: result)
-          : _TabletLayout(result: result),
+          ? MobileLayout(result: result, textTheme: textTheme, colors: colors)
+          : TabletLayout(result: result, textTheme: textTheme, colors: colors),
     );
   }
 }
 
-class _MobileLayout extends StatelessWidget {
-  final ResultEntity result;
-  const _MobileLayout({required this.result});
 
-  @override
-  Widget build(BuildContext context) {
-    final r = Responsive(context);
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ImageHeader(
-            ImagePath: "${ApiConstants.imageUrl}${result.posterPath}",
-          ),
-          SizedBox(height: r.spacingM),
-          DetailScreen_Footer(result: result),
-        ],
-      ),
-    );
-  }
-}
-
-class _TabletLayout extends StatelessWidget {
-  final ResultEntity result;
-  const _TabletLayout({required this.result});
-
-  @override
-  Widget build(BuildContext context) {
-    final r = Responsive(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: r.w * 0.42,
-          height: double.infinity,
-          child: ImageHeader(
-            ImagePath: "${ApiConstants.imageUrl}${result.posterPath}",
-          ),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            child: DetailScreen_Footer(result: result),
-          ),
-        ),
-      ],
-    );
-  }
-}

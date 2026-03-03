@@ -21,8 +21,7 @@ void main() {
       Apidio: mockDio,
       secureStorageBase: mockSecureStorage,
     );
-    when(mockSecureStorage.getValue(any))
-        .thenAnswer((_) async => 'fake_token');
+    when(mockSecureStorage.getValue(any)).thenAnswer((_) async => 'fake_token');
   });
 
   final tResponseData = {
@@ -48,6 +47,14 @@ void main() {
     'total_pages': 3,
     'total_results': 60,
   };
+  final fakeResponseData = {
+    'page': 1,
+    'results': [
+      {'video': false, 'vote_average': 8.0, 'vote_count': 100},
+    ],
+    'total_pages': 3,
+    'total_results': 60,
+  };
 
   group('getMovies', () {
     test('returns MovieDetail on HTTP 200', () async {
@@ -65,7 +72,22 @@ void main() {
       expect(result.page, 1);
       expect(result.results!.length, 1);
     });
+    test('throws Exception when response structure is invalid', () async {
+      // Given
+      when(mockDio.get(any, options: anyNamed('options'))).thenAnswer(
+        (_) async => Response(
+          data: fakeResponseData,
+          statusCode: 200,
+          requestOptions: RequestOptions(path: ''),
+        ),
+      );
 
+      // When
+      final call = dataSource.getMovies(page: 1, filter: 'popular');
+
+      // Then
+      expect(call, throwsException);
+    });
     test('throws Exception when status code is not 200', () async {
       when(mockDio.get(any, options: anyNamed('options'))).thenAnswer(
         (_) async => Response(

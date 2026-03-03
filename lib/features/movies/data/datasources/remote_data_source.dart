@@ -19,7 +19,6 @@ class MoviesDataSource extends DashboardDataSource {
   @override
   Future<MovieDetail> getMovies({int? page, String? filter}) async {
     try {
-      print("enter tryyyy");
       final token = await secureStorageBase.getValue(Constants.apiToken);
       final response = await Apidio.get(
         "${ApiConstants.apiURL(page ?? 1, filter ?? 'popular')}",

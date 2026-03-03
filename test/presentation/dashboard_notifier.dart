@@ -55,8 +55,7 @@ void main() {
           .thenAnswer((_) async => tMovieEntity);
 
       await container
-          .read(dashboardNotifierProvider.notifier)
-          .fetchProducts(page: 1, filter: 'popular');
+          .read(dashboardNotifierProvider.notifier).fetch(page: 1, filter: 'top_rated');
 
       final state = container.read(dashboardNotifierProvider);
       expect(state, isA<AsyncData<MovieEntity>>());

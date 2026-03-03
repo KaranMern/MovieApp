@@ -5,6 +5,7 @@ class CustomAppBar extends StatefulWidget {
   final String title;
   final bool isDark;
   final ValueChanged<bool> onChanged;
+
   const CustomAppBar({
     super.key,
     required this.title,
@@ -28,7 +29,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     final r = Responsive(context);
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Container(
       padding: r.appBarPadding,
@@ -45,7 +47,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
           Expanded(
             child: Text(
               widget.title,
-              style: r.appBarTitleStyle(colors.onPrimary),
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontSize: r.appBarTitleSize,color: colors.onPrimary// responsive size
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -55,9 +59,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               widget.onChanged(isDark);
             },
             iconSize: r.iconSizeMedium,
-            icon: isDark
-                ? const Icon(Icons.dark_mode)
-                : const Icon(Icons.sunny),
+            icon: Icon(isDark ? Icons.dark_mode : Icons.sunny),
             color: colors.onPrimary,
           ),
         ],

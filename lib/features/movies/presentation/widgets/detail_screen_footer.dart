@@ -17,33 +17,40 @@ class DetailScreen_Footer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Movie Title
           Text(result.title ?? "", style: r.titleStyle(colors.onBackground)),
+          Divider(thickness: 1, color: colors.onBackground, endIndent: 7),
           SizedBox(height: r.spacingM),
-
+          // Overview Heading
           Text(Constants.overview, style: r.headingStyle(colors.onBackground)),
           SizedBox(height: r.spacingS),
 
+          // Overview Text
           Text(result.overview ?? "", style: r.bodyStyle(colors.onBackground)),
           SizedBox(height: r.spacingM),
 
+          // Language Heading
           Text(
             Constants.language,
             style: r.subHeadingStyle(colors.onBackground),
           ),
           SizedBox(height: r.spacingXS),
 
+          // Original Language
           Text(
             result.originalLanguage ?? "",
             style: r.bodyStyle(colors.onBackground),
           ),
           SizedBox(height: r.spacingM),
 
+          // Popularity Heading
           Text(
             Constants.popularity,
             style: r.subHeadingStyle(colors.onBackground),
           ),
           SizedBox(height: r.spacingXS),
 
+          // Popularity Value
           Text(
             result.popularity?.toString() ?? "",
             style: r.bodyStyle(colors.onBackground),

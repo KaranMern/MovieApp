@@ -9,49 +9,83 @@ import '../presentation/dashboard_provider.dart';
 @riverpod
 class DashboardNotifier extends AsyncNotifier<MovieEntity> {
   late DashboardRepository dashboardRepository;
+
   int _currentPage = 1;
-  String Moviefilter = "top_rated";
+  String _movieFilter = "top_rated";
+  bool _isLoadingMore = false;
+
   @override
   Future<MovieEntity> build() async {
     dashboardRepository = ref.read(dashboardRepositoryProvider);
-    return fetchProducts(page: _currentPage, filter: Moviefilter);
+    return fetch(page: 1, filter: _movieFilter);
   }
 
-  Future<MovieEntity> fetchProducts({
+  Future<MovieEntity> fetch({
     required int page,
     required String filter,
   }) async {
+    final response =
+    await dashboardRepository.fetchProducts(page: page, filter: filter);
+
+    _currentPage = page;
+    _movieFilter = filter;
+
+    return response;
+  }
+  Future<void> refreshMovies({String? filter}) async {
+    _currentPage = 1;
+    _movieFilter = filter ?? _movieFilter;
+
+    state = const AsyncLoading();
+
     try {
-      final previousData = state.value;
+      final response =
+      await fetch(page: 1, filter: _movieFilter);
 
-      if (page == 1) {
-        state = const AsyncValue.loading();
-      }
-
-      final response = await dashboardRepository.fetchProducts(page: page,filter: filter);
-
-      _currentPage = page;
-      Moviefilter = filter;
-
-      if (previousData == null || page == 1) {
-        state = AsyncValue.data(response);
-        return response;
-      } else {
-        final updatedResults = [...?previousData.results, ...?response.results];
-
-        final updatedMovieEntity = MovieEntity(
-          page: response.page,
-          results: updatedResults,
-          totalPages: response.totalPages,
-          totalResults: response.totalResults,
-        );
-
-        state = AsyncValue.data(updatedMovieEntity);
-        return updatedMovieEntity;
-      }
+      state = AsyncData(response);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
-      rethrow;
+      state = AsyncError(e, st);
     }
+  }
+
+  Future<void> loadMore() async {
+    if (_isLoadingMore) return;
+
+    final currentState = state.value;
+    if (currentState == null) return;
+
+    if (_currentPage >= (currentState.totalPages ?? 1)) return;
+
+    _isLoadingMore = true;
+
+    try {
+      final nextPage = _currentPage + 1;
+
+      final response =
+      await dashboardRepository.fetchProducts(
+        page: nextPage,
+        filter: _movieFilter,
+      );
+
+      final updatedResults = [
+        ...?currentState.results,
+        ...?response.results,
+      ];
+
+      final updatedMovieEntity = MovieEntity(
+        page: response.page,
+        results: updatedResults,
+        totalPages: response.totalPages,
+        totalResults: response.totalResults,
+      );
+
+      _currentPage = nextPage;
+
+      state = AsyncData(updatedMovieEntity);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+
+    _isLoadingMore = false;
   }
 }
