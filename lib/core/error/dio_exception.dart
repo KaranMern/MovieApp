@@ -1,7 +1,11 @@
 import 'package:dio/dio.dart';
-import 'exception.dart';
+import 'package:sample/core/error/exception.dart';
 
+/// Maps [DioException] from Dio into app-specific [AppException] types
+/// for consistent error handling in the UI and repository layer.
 class DioExceptionMapper {
+  /// Returns the appropriate [AppException] based on [e.type] and, for
+  /// [DioExceptionType.badResponse], the HTTP status code.
   static AppException map(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
@@ -19,8 +23,6 @@ class DioExceptionMapper {
         final statusCode = e.response?.statusCode;
 
         switch (statusCode) {
-          case 400:
-            return BadRequestException(message: e.response?.data['message']);
           case 401:
             return UnauthorizedException();
           case 403:

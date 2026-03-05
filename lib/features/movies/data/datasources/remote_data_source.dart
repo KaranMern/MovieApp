@@ -1,43 +1,44 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sample/core/Constants/api_constants.dart';
+import 'package:sample/core/error/dio_exception.dart';
 import 'package:sample/core/error/exception.dart';
-import '../../../../core/Constants/api_constants.dart';
-import '../../../../core/Constants/string_constants.dart';
-import '../../../../core/error/dio_exception.dart';
-import '../../../../core/network/secure_storage.dart';
-import '../models/movie_detail.dart';
+import 'package:sample/features/movies/data/models/movie_detail.dart';
 
+/// Contract for fetching paginated movie list data from a remote source.
 abstract class DashboardDataSource {
   Future<MovieDetail> getMovies({int? page, String? filter});
 }
 
+/// Remote data source implementation using Dio and TMDB API.
+/// Uses [apidio] for HTTP and [apiToken] (from env or constructor) for auth.
 class MoviesDataSource extends DashboardDataSource {
-  final Dio Apidio;
-  final SecureStorageBase secureStorageBase;
-  // final FirebaseCrashlytics crashlytics;
-  MoviesDataSource({required this.Apidio, required this.secureStorageBase});
+  MoviesDataSource({
+    required this.apidio,
+    String? apiToken,
+  }) : apiToken = apiToken ?? dotenv.env['MOVIE_API_TOKEN'];
+
+  final Dio apidio;
+  final String? apiToken;
 
   @override
   Future<MovieDetail> getMovies({int? page, String? filter}) async {
     try {
-      final token = await secureStorageBase.getValue(Constants.apiToken);
-      final response = await Apidio.get(
-        "${ApiConstants.apiURL(page ?? 1, filter ?? 'popular')}",
+      final response = await apidio.get(
+        ApiConstants.apiURL(page ?? 1, filter ?? 'popular'),
         options: Options(
-          headers: {"${ApiConstants.authorization}": "${token}"},
+          headers: {ApiConstants.authorization: apiToken},
         ),
       );
 
       if (response.statusCode == 200) {
         return MovieDetail.fromJson(response.data);
       } else {
-        throw ServerException(message: "Failed to get Movie Details");
+        throw ServerException(message: 'Failed to get Movie Details');
       }
-    }
-    // crashlytics.recordError(e, st);
-    on DioException catch (e) {
+    } on DioException catch (e) {
       throw DioExceptionMapper.map(e);
-    } catch (e, stackTrace) {
-      // crashlytics.recordError(e, stackTrace);
+    } catch (e) {
       throw ServerException(message: e.toString());
     }
   }

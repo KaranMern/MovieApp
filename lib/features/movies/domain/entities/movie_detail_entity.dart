@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'movie_detail_entity.freezed.dart';
 
+/// Domain entity: paginated movie list (mirrors API structure).
 @freezed
 class MovieEntity with _$MovieEntity {
   const factory MovieEntity({
@@ -12,6 +13,7 @@ class MovieEntity with _$MovieEntity {
   }) = _MovieEntity;
 }
 
+/// Domain entity: single movie result for list and detail screens.
 @freezed
 class ResultEntity with _$ResultEntity {
   const factory ResultEntity({

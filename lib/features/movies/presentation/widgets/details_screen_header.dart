@@ -1,9 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/responsive/responsive.dart';
+import 'package:sample/core/responsive/responsive.dart';
 
+/// Full-width (or fixed height on mobile) movie poster/backdrop with rounded
+/// bottom corners. Shows loading progress or broken-image icon on error.
 class ImageHeader extends StatelessWidget {
+  const ImageHeader({required this.imagePath, super.key});
   final String imagePath;
-  const ImageHeader({super.key, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
@@ -12,27 +15,22 @@ class ImageHeader extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: r.imageHeaderRadius,
-      child: Image.network(
-        imagePath,
+      child: CachedNetworkImage(
+        imageUrl: imagePath,
         width: double.infinity,
         height: r.detailImageHeight,
         fit: BoxFit.contain,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return SizedBox(
-            height: r.detailImageHeight,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: colors.primary,
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes!
-                    : null,
-              ),
+
+        placeholder: (context, url) => SizedBox(
+          height: r.detailImageHeight,
+          child: Center(
+            child: CircularProgressIndicator(
+              color: colors.primary,
             ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) => SizedBox(
+          ),
+        ),
+
+        errorWidget: (context, url, error) => SizedBox(
           height: r.detailImageHeight,
           child: Center(
             child: Icon(
