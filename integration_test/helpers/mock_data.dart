@@ -3,7 +3,7 @@
 import 'package:sample/features/movies/domain/entities/movie_detail_entity.dart';
 
 class MockData {
-  static MovieEntity movieEntity = MovieEntity(
+  static MovieEntity movieEntity = const MovieEntity(
     page: 1,
     totalPages: 2,
     totalResults: 20,
@@ -17,7 +17,7 @@ class MockData {
         adult: false,
         video: false,
         genreIds: [28],
-        popularity: 100.0,
+        popularity: 100,
         overview: 'A great movie',
         originalLanguage: 'en',
         originalTitle: 'Avengers',
@@ -32,7 +32,7 @@ class MockData {
         adult: false,
         video: false,
         genreIds: [28, 12],
-        popularity: 90.0,
+        popularity: 90,
         overview: 'Spider-Man movie',
         originalLanguage: 'en',
         originalTitle: 'Spider-Man',

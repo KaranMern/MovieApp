@@ -1,17 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/Constants/api_constants.dart';
-import '../../../../core/Constants/string_constants.dart';
-import '../../../../core/constants/key_constants.dart';
-import '../../../../core/network/secure_storage.dart';
-import '../../../../core/responsive/responsive.dart';
-import '../dashboard_provider.dart';
-import '../Widgets/custom_appbar.dart';
-import '../Widgets/custom_container.dart';
-import '../widgets/custom_tabbar.dart';
+import 'package:sample/core/Constants/string_constants.dart';
+import 'package:sample/core/constants/key_constants.dart';
+import 'package:sample/core/responsive/responsive.dart';
+import 'package:sample/features/movies/presentation/Widgets/custom_appbar.dart';
+import 'package:sample/features/movies/presentation/Widgets/custom_container.dart';
+import 'package:sample/features/movies/presentation/dashboard_providers.dart';
+import 'package:sample/features/movies/presentation/widgets/custom_tabbar.dart';
 
+/// Main dashboard: tabbed movie list (Top rated / Popular), pull-to-refresh,
+/// and infinite scroll. Uses [dashboardNotifierProvider] for data and
+/// [themeProvider] for app bar theme toggle.
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -22,31 +25,37 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen>
     with SingleTickerProviderStateMixin {
   final ScrollController scrollController = ScrollController();
-  bool isDark = false;
-  String option = Constants.popular;
   late TabController _tabController;
+
+  /// Debounce timer to avoid calling loadMore too frequently on scroll.
+  Timer? _scrollDebounce;
+
+  /// Current filter: [Constants.popular] or [Constants.topRated] (API value).
+  String option = Constants.popular;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     scrollController.addListener(_onScroll);
-    _initialize();
   }
 
-  Future<void> _initialize() async {
-    await SecureStorage().setValue(Constants.apiToken, ApiConstants.token);
-  }
-
+  /// When user scrolls near bottom (within 200px), triggers load more after 300ms debounce.
   void _onScroll() {
-    if (scrollController.position.pixels >=
-        scrollController.position.maxScrollExtent - 200) {
-      ref.read(dashboardNotifierProvider.notifier).loadMore();
-    }
+    if (!scrollController.hasClients) return;
+
+    if (_scrollDebounce?.isActive ?? false) return;
+
+    _scrollDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (scrollController.position.extentAfter < 200) {
+        ref.read(dashboardNotifierProvider.notifier).loadMore();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _scrollDebounce?.cancel();
     scrollController.removeListener(_onScroll);
     scrollController.dispose();
     _tabController.dispose();
@@ -59,27 +68,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final state = ref.watch(dashboardNotifierProvider);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final isDark = ref.watch(themeProvider) == ThemeMode.dark;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.tertiary,
       appBar: AppBar(
         backgroundColor: colors.primary,
         title: CustomAppBar(
           title: Constants.appName,
           isDark: isDark,
-          onChanged: (val) {
-            setState(() => isDark = val);
+          onChanged: (_) {
             ref.read(themeProvider.notifier).toggleTheme();
           },
         ),
         bottom: CustomTabBar(
           controller: _tabController,
-          tabs: [Constants.Toprated, Constants.Popular],
+          tabs: [Constants.filterTopRated, Constants.filterPopular],
           labelPadding: r.tabPadding,
           onTap: (index) async {
-            option = index == 0
-                ? Constants.topRated
-                : Constants.popular;
+            option =
+                index == 0 ? Constants.topRated : Constants.popular;
 
             await ref
                 .read(dashboardNotifierProvider.notifier)
@@ -89,7 +97,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       ),
       body: state.when(
         data: (data) {
-          if (data.results == null || data.results!.isEmpty) {
+          final results = data.results ?? [];
+
+          if (results.isEmpty) {
             return Center(
               child: Text(
                 Constants.noData,
@@ -98,46 +108,54 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             );
           }
 
-          final results = data.results ?? [];
-
           return RefreshIndicator(
-            key: KeyConstants.refreshIndicator,
             onRefresh: () async {
               await ref
                   .read(dashboardNotifierProvider.notifier)
                   .refreshMovies(filter: option);
             },
-            child: GridView.builder(
-              key: KeyConstants.movieGrid,
-              padding: EdgeInsets.all(r.gridPadding),
+            child: CustomScrollView(
               controller: scrollController,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: r.gridCrossAxisCount,
-                childAspectRatio: r.gridAspectRatio,
-                crossAxisSpacing: r.gridSpacing,
-                mainAxisSpacing: r.gridSpacing,
-              ),
-              itemCount: results.length + 1,
-              itemBuilder: (context, index) {
-                if (index == results.length) {
-                  return const Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                }
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.all(r.gridPadding),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: r.gridCrossAxisCount,
+                      childAspectRatio: r.gridAspectRatio,
+                      crossAxisSpacing: r.gridSpacing,
+                      mainAxisSpacing: r.gridSpacing,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final movie = results[index];
 
-                final movie = results[index];
+                        return CustomCard(
+                          key: KeyConstants.movieCard,
+                          posterPath: movie.posterPath ?? '',
+                          releaseDate: movie.releaseDate ?? '',
+                          title: movie.title ?? 'Untitled',
+                          voteAverage: (movie.voteAverage ?? 0.0).toInt(),
+                          onPressed: () {
+                            context.push('/DetailScreen', extra: movie);
+                          },
+                        );
+                      },
+                      childCount: results.length,
+                    ),
+                  ),
+                ),
 
-                return CustomCard(
-                  key: KeyConstants.movieCard,
-                  posterPath: movie.posterPath!,
-                  releaseDate: movie.releaseDate!,
-                  title: movie.title!,
-                  voteAverage: movie.voteAverage!.toInt(),
-                  onPressed: () {
-                    context.push("/DetailScreen", extra: movie);
-                  },
-                );
-              },
+                /// Placeholder for loading indicator when loading more.
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: CupertinoActivityIndicator(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -149,7 +167,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         ),
         error: (err, st) => Center(
           child: Text(
-            "Error: $err",
+            'Error: $err',
             style: theme.textTheme.bodyMedium,
           ),
         ),

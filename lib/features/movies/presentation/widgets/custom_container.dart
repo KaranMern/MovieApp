@@ -1,22 +1,25 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sample/core/Constants/api_constants.dart';
-import '../../../../core/responsive/responsive.dart';
+import 'package:sample/core/responsive/responsive.dart';
 
+/// Card for a single movie: poster image, rating badge, title, release date.
+/// Tapping triggers [onPressed]. Uses [ApiConstants.imageUrl] + [posterPath]
+/// for the image URL and [CachedNetworkImage] for loading/error states.
 class CustomCard extends StatelessWidget {
-  final String posterPath;
-  final String title;
-  final VoidCallback onPressed;
-  final String releaseDate;
-  final int voteAverage;
-
   const CustomCard({
-    super.key,
     required this.posterPath,
     required this.title,
     required this.releaseDate,
     required this.voteAverage,
     required this.onPressed,
+    super.key,
   });
+  final String posterPath;
+  final String title;
+  final VoidCallback onPressed;
+  final String releaseDate;
+  final int voteAverage;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,6 @@ class CustomCard extends StatelessWidget {
         ),
         padding: r.cardPadding,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Image + Rating Badge
             Expanded(
@@ -44,24 +46,17 @@ class CustomCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(r.radiusM),
-                    child: Image.network(
-                      "${ApiConstants.imageUrl}$posterPath",
+                    child: CachedNetworkImage(
+                      imageUrl: '${ApiConstants.imageUrl}$posterPath',
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: colors.primary,
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) => Center(
+                      placeholder: (context, url) => Center(
+                        child: CircularProgressIndicator(
+                          color: colors.primary,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Center(
                         child: Icon(
                           Icons.broken_image,
                           color: colors.onSurface,
@@ -112,13 +107,12 @@ class CustomCard extends StatelessWidget {
 
             // Title
             Flexible(
-              flex: 1,
               child: Text(
                 title,
                 textAlign: TextAlign.center,
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: colors.onBackground,
+                  color: colors.surfaceContainer,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -131,7 +125,7 @@ class CustomCard extends StatelessWidget {
             Text(
               releaseDate,
               style: textTheme.bodySmall?.copyWith(
-                color: colors.onBackground.withOpacity(0.7),
+                color: colors.surfaceContainer.withOpacity(0.7),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
