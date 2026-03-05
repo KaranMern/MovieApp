@@ -10,7 +10,8 @@ import 'package:sample/features/movies/presentation/Screens/detail_screen.dart';
 import 'package:sample/features/movies/presentation/dashboard_providers.dart';
 import 'package:sample/features/movies/providers/dashboard_notifier.dart';
 
-import 'helpers/fake_notier.dart';
+import 'helpers/fake_notifier_test.dart';
+
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
