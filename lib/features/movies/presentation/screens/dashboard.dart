@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,9 @@ import 'package:sample/features/movies/presentation/Widgets/custom_appbar.dart';
 import 'package:sample/features/movies/presentation/Widgets/custom_container.dart';
 import 'package:sample/features/movies/presentation/dashboard_providers.dart';
 import 'package:sample/features/movies/presentation/widgets/custom_tabbar.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+
+import '../../../../core/logger/app_logger.dart';
 
 /// Main dashboard: tabbed movie list (Top rated / Popular), pull-to-refresh,
 /// and infinite scroll. Uses [dashboardNotifierProvider] for data and
@@ -66,6 +70,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   Widget build(BuildContext context) {
     final r = Responsive(context);
     final state = ref.watch(dashboardNotifierProvider);
+    AppLogger.info("User opened dashboard");
+    // FirebaseCrashlytics.instance.crash();
+    // AppLogger.error(
+    //   Exception("Test error"),
+    //   StackTrace.current,
+    // );
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = ref.watch(themeProvider) == ThemeMode.dark;
@@ -74,6 +84,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       backgroundColor: colors.tertiary,
       appBar: AppBar(
         backgroundColor: colors.primary,
+        leading: ElevatedButton(onPressed: (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TalkerScreen(
+                talker: AppLogger.talker,
+              ),
+            ),
+          );
+        }, child: Text("View Logs")),
         title: CustomAppBar(
           title: Constants.appName,
           isDark: isDark,

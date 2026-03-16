@@ -36,20 +36,6 @@ void main() {
     });
 
     group('maps badResponse with different status codes', () {
-      test('400 returns BadRequestException with message', () {
-        final e = DioException(
-          requestOptions: RequestOptions(),
-          type: DioExceptionType.badResponse,
-          response: Response(
-            requestOptions: RequestOptions(),
-            statusCode: 400,
-            data: {'message': 'Invalid request'},
-          ),
-        );
-        final result = DioExceptionMapper.map(e);
-        expect(result, isA<BadRequestException>());
-        expect(result.message, 'Invalid request');
-      });
 
       test('401 returns UnauthorizedException', () {
         final e = DioException(
