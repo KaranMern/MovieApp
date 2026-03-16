@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import '../../../../core/responsive/responsive.dart';
+import 'package:sample/core/responsive/responsive.dart';
 
+/// App bar content: icon, [title], and theme toggle button that invokes [onChanged].
+/// [isDark] drives the icon (sun vs moon) and is toggled when the button is pressed.
 class CustomAppBar extends StatefulWidget {
-  final String title;
-  final bool isDark;
-  final ValueChanged<bool> onChanged;
-
   const CustomAppBar({
-    super.key,
     required this.title,
     required this.onChanged,
     required this.isDark,
+    super.key,
   });
+  final String title;
+  final bool isDark;
+  final ValueChanged<bool> onChanged;
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -23,7 +24,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
   @override
   void initState() {
     super.initState();
-    isDark = widget.isDark;
   }
 
   @override
@@ -32,9 +32,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return Container(
+    return Padding(
       padding: r.appBarPadding,
-      color: colors.primary,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -48,18 +47,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
             child: Text(
               widget.title,
               style: theme.textTheme.titleSmall?.copyWith(
-                fontSize: r.appBarTitleSize,color: colors.onPrimary// responsive size
+                fontSize: r.appBarTitleSize,
               ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
           IconButton(
             onPressed: () {
-              setState(() => isDark = !isDark);
-              widget.onChanged(isDark);
+              widget.onChanged(!widget.isDark);
             },
             iconSize: r.iconSizeMedium,
-            icon: Icon(isDark ? Icons.dark_mode : Icons.sunny),
+            icon: Icon(widget.isDark ? Icons.dark_mode : Icons.sunny),
             color: colors.onPrimary,
           ),
         ],

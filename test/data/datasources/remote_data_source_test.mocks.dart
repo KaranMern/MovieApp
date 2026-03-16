@@ -13,7 +13,6 @@ import 'package:dio/src/options.dart' as _i2;
 import 'package:dio/src/response.dart' as _i6;
 import 'package:dio/src/transformer.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:sample/core/network/secure_storage.dart' as _i10;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -833,39 +832,4 @@ class MockDio extends _i1.Mock implements _i7.Dio {
           ),
         ),
       ) as _i7.Dio);
-}
-
-/// A class which mocks [SecureStorageBase].
-///
-/// See the documentation for Mockito's code generation for more information.
-class MockSecureStorageBase extends _i1.Mock implements _i10.SecureStorageBase {
-  MockSecureStorageBase() {
-    _i1.throwOnMissingStub(this);
-  }
-
-  @override
-  _i8.Future<String?> getValue(String? key) => (super.noSuchMethod(
-        Invocation.method(
-          #getValue,
-          [key],
-        ),
-        returnValue: _i8.Future<String?>.value(),
-      ) as _i8.Future<String?>);
-
-  @override
-  _i8.Future<void> setValue(
-    String? key,
-    String? value,
-  ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #setValue,
-          [
-            key,
-            value,
-          ],
-        ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
 }

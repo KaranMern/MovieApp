@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 
+/// Tab bar used under the app bar with [controller], [tabs] labels, and
+/// optional [onTap]. Implements [PreferredSizeWidget] for [AppBar.bottom].
 class CustomTabBar extends StatelessWidget implements PreferredSizeWidget {
+  const CustomTabBar({
+    required this.controller,
+    required this.tabs,
+    super.key,
+    this.labelPadding,
+    this.onTap,
+  });
   final TabController controller;
   final List<String> tabs;
   final EdgeInsetsGeometry? labelPadding;
   final void Function(int index)? onTap;
-
-  const CustomTabBar({
-    Key? key,
-    required this.controller,
-    required this.tabs,
-    this.labelPadding,
-    this.onTap,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -37,7 +37,7 @@ class FakeErrorNotifier extends DashboardNotifier {
 
 class FakeEmptyNotifier extends DashboardNotifier {
   @override
-  Future<MovieEntity> build() async => MovieEntity(
+  Future<MovieEntity> build() async => const MovieEntity(
     page: 1,
     totalPages: 1,
     totalResults: 0,
@@ -49,13 +49,13 @@ class FakeEmptyNotifier extends DashboardNotifier {
     required int page,
     required String filter,
   }) async {
-    final empty = MovieEntity(
+    const empty = MovieEntity(
       page: 1,
       totalPages: 1,
       totalResults: 0,
       results: [],
     );
-    state = AsyncData(empty);
+    state = const AsyncData(empty);
     return empty;
   }
 }

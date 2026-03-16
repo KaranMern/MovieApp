@@ -7,11 +7,11 @@ import 'package:sample/core/constants/key_constants.dart';
 import 'package:sample/features/movies/presentation/Screens/dashboard.dart';
 import 'package:sample/features/movies/presentation/Screens/detail_screen.dart';
 
-import 'package:sample/features/movies/presentation/dashboard_provider.dart';
+import 'package:sample/features/movies/presentation/dashboard_providers.dart';
 import 'package:sample/features/movies/providers/dashboard_notifier.dart';
 
-import 'helpers/fake_notier.dart';
-import 'helpers/mock_data.dart';
+import 'helpers/fake_notifier_test.dart';
+
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

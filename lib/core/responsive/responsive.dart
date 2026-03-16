@@ -1,78 +1,85 @@
 import 'package:flutter/material.dart';
 
+/// Responsive layout and styling helper. Uses [context] to derive screen size
+/// and exposes breakpoints (mobile/tablet/desktop), typography scales,
+/// spacing, and grid settings for consistent UI across devices.
 class Responsive {
-  final BuildContext context;
-  final double w;
-  final double h;
-
   Responsive(this.context)
-    : w = MediaQuery.of(context).size.width,
-      h = MediaQuery.of(context).size.height;
+      : w = MediaQuery.of(context).size.width,
+        h = MediaQuery.of(context).size.height;
+
+  final BuildContext context;
+  /// Screen width in logical pixels.
+  final double w;
+  /// Screen height in logical pixels.
+  final double h;
 
   bool get isMobile => w < 600;
   bool get isTablet => w >= 600 && w < 1024;
   bool get isDesktop => w >= 1024;
 
+  // Typography (scaled by breakpoint)
   double get titleSize => isDesktop
       ? w * 0.022
       : isTablet
-      ? w * 0.033
-      : w * 0.055;
+          ? w * 0.033
+          : w * 0.055;
 
   double get headingSize => isDesktop
       ? w * 0.018
       : isTablet
-      ? w * 0.025
-      : w * 0.045;
+          ? w * 0.025
+          : w * 0.045;
 
   double get subHeadingSize => isDesktop
       ? w * 0.016
       : isTablet
-      ? w * 0.022
-      : w * 0.040;
+          ? w * 0.022
+          : w * 0.040;
 
   double get bodySize => isDesktop
       ? w * 0.014
       : isTablet
-      ? w * 0.020
-      : w * 0.035;
+          ? w * 0.020
+          : w * 0.035;
 
   double get captionSize => isDesktop
       ? w * 0.012
       : isTablet
-      ? w * 0.016
-      : w * 0.028;
+          ? w * 0.016
+          : w * 0.028;
 
   double get appBarTitleSize => isDesktop
       ? w * 0.018
       : isTablet
-      ? w * 0.026
-      : w * 0.048;
+          ? w * 0.026
+          : w * 0.048;
 
   double get tabLabelSize => isDesktop
       ? w * 0.014
       : isTablet
-      ? w * 0.020
-      : w * 0.032;
+          ? w * 0.020
+          : w * 0.032;
 
   double get iconSizeLarge => isDesktop
       ? w * 0.025
       : isTablet
-      ? w * 0.035
-      : w * 0.065;
+          ? w * 0.035
+          : w * 0.065;
 
   double get iconSizeMedium => isDesktop
       ? w * 0.020
       : isTablet
-      ? w * 0.028
-      : w * 0.055;
+          ? w * 0.028
+          : w * 0.055;
 
   double get iconSizeSmall => isDesktop
       ? w * 0.015
       : isTablet
-      ? w * 0.020
-      : w * 0.040;
+          ? w * 0.020
+          : w * 0.040;
 
+  // Spacing (height-based)
   double get spacingXS => h * 0.005;
   double get spacingS => h * 0.010;
   double get spacingM => h * 0.020;
@@ -86,43 +93,33 @@ class Responsive {
   EdgeInsets get screenPadding => EdgeInsets.symmetric(horizontal: paddingM);
 
   EdgeInsets get cardPadding => EdgeInsets.all(
-    isDesktop
-        ? w * 0.015
-        : isTablet
-        ? w * 0.018
-        : w * 0.025,
-  );
+        isDesktop
+            ? w * 0.015
+            : isTablet
+                ? w * 0.018
+                : w * 0.025,
+      );
 
   EdgeInsets get appBarPadding => EdgeInsets.symmetric(vertical: h * 0.015);
 
   EdgeInsets get tabPadding => EdgeInsets.symmetric(
-    horizontal: isDesktop
-        ? w * 0.06
-        : isTablet
-        ? w * 0.15
-        : w * 0.13,
-  );
+        horizontal: isDesktop
+            ? w * 0.06
+            : isTablet
+                ? w * 0.15
+                : w * 0.13,
+      );
 
-  int get gridCrossAxisCount => isDesktop
-      ? 4
-      : isTablet
-      ? 3
-      : 2;
+  // Grid (dashboard movie list)
+  int get gridCrossAxisCount => isDesktop ? 4 : isTablet ? 3 : 2;
 
-  double get gridAspectRatio => isDesktop
-      ? 0.65
-      : isTablet
-      ? 0.70
-      : 0.75;
+  double get gridAspectRatio => isDesktop ? 0.65 : isTablet ? 0.70 : 0.75;
 
-  double get gridSpacing => isDesktop
-      ? 16.0
-      : isTablet
-      ? 12.0
-      : 8.0;
+  double get gridSpacing => isDesktop ? 16.0 : isTablet ? 12.0 : 8.0;
 
   double get gridPadding => w * 0.02;
 
+  // Border radius
   double get radiusS => w * 0.02;
   double get radiusM => w * 0.04;
   double get radiusL => w * 0.08;
@@ -130,12 +127,13 @@ class Responsive {
   BorderRadius get cardRadius => BorderRadius.circular(radiusM);
 
   BorderRadius get imageHeaderRadius => BorderRadius.only(
-    bottomLeft: Radius.circular(radiusL),
-    bottomRight: Radius.circular(radiusL),
-  );
+        bottomLeft: Radius.circular(radiusL),
+        bottomRight: Radius.circular(radiusL),
+      );
 
   double get detailImageHeight => isMobile ? h * 0.45 : h;
 
+  // Pre-built text styles using responsive sizes
   TextStyle titleStyle(Color color, {FontWeight weight = FontWeight.bold}) =>
       TextStyle(fontSize: titleSize, fontWeight: weight, color: color);
 
@@ -145,7 +143,8 @@ class Responsive {
   TextStyle subHeadingStyle(
     Color color, {
     FontWeight weight = FontWeight.w600,
-  }) => TextStyle(fontSize: subHeadingSize, fontWeight: weight, color: color);
+  }) =>
+      TextStyle(fontSize: subHeadingSize, fontWeight: weight, color: color);
 
   TextStyle bodyStyle(Color color, {FontWeight weight = FontWeight.normal}) =>
       TextStyle(fontSize: bodySize, fontWeight: weight, color: color);
@@ -154,10 +153,10 @@ class Responsive {
       TextStyle(fontSize: captionSize, fontWeight: weight, color: color);
 
   TextStyle appBarTitleStyle(Color color) => TextStyle(
-    fontSize: appBarTitleSize,
-    fontWeight: FontWeight.bold,
-    color: color,
-  );
+        fontSize: appBarTitleSize,
+        fontWeight: FontWeight.bold,
+        color: color,
+      );
 
   TextStyle tabLabelStyle(Color color, {FontWeight weight = FontWeight.w600}) =>
       TextStyle(fontSize: tabLabelSize, fontWeight: weight, color: color);

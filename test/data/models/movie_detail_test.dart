@@ -1,7 +1,10 @@
 // test/data/models/movie_detail_test.dart
-import 'package:flutter_test/flutter_test.dart';
-import 'package:sample/features/Movies/data/models/movie_detail.dart';
 
+import 'package:flutter_test/flutter_test.dart';
+import 'package:sample/features/movies/data/models/movie_detail.dart';
+
+/// Unit tests for [MovieDetail] and [Results] models: [fromJson] parsing,
+/// [toJson] serialization, and edge cases (null results, missing fields).
 void main() {
   group('MovieDetail Model', () {
     final tJson = {

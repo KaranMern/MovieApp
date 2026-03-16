@@ -1,14 +1,16 @@
-import '../../data/datasources/remote_data_source.dart';
-import '../entities/movie_detail_entity.dart';
+import 'package:sample/features/movies/data/datasources/remote_data_source.dart';
+import 'package:sample/features/movies/domain/entities/movie_detail_entity.dart';
 
+/// Repository contract for fetching movie list data (domain layer).
 abstract class DashboardRepository {
   Future<MovieEntity> fetchProducts({int? page, String? filter});
 }
 
+/// Implementation that uses [DashboardDataSource] and maps [MovieDetail]
+/// model to [MovieEntity] / [ResultEntity] for the domain.
 class DashboardRepositoryImpl extends DashboardRepository {
-  final DashboardDataSource dashboardDatasource;
-
   DashboardRepositoryImpl(this.dashboardDatasource);
+  final DashboardDataSource dashboardDatasource;
 
   @override
   Future<MovieEntity> fetchProducts({int? page, String? filter}) async {
